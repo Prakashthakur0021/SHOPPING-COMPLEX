@@ -4,7 +4,7 @@ import { LinkContainer} from 'react-router-bootstrap'
 import Message from '../components/Message'
 import { useDispatch, useSelector } from 'react-redux'
 import Loader from '../components/Loader'
-import {listProducts } from '../actions/productActions'
+import {deleteProduct, listProducts } from '../actions/productActions'
 
 const UserListScreen = ({history}) => {
     const dispatch = useDispatch()
@@ -14,6 +14,9 @@ const UserListScreen = ({history}) => {
 
     const userLogin = useSelector(state => state.userLogin)
     const { userInfo} = userLogin
+
+    const productDelete = useSelector(state => state.productDelete)
+    const { loading:loadingDelete, error:errorDelete, success:successDelete} = productDelete
     
 
     useEffect(() => {
@@ -22,11 +25,12 @@ const UserListScreen = ({history}) => {
         } else {
             history.push('/login')
         }
-    },[dispatch, history, userInfo])
+    },[dispatch, history, userInfo, successDelete])
 
     const deleteHandler = (id) => {
         if(window.confirm('Are you sure')){
             // Delete Product
+            dispatch(deleteProduct(id))
         }
     }
 
@@ -46,7 +50,8 @@ const UserListScreen = ({history}) => {
                     </Button>
                 </Col>
             </Row>
-            <h1>User</h1>
+            {loadingDelete && <Loader/>}
+            {errorDelete && <Message variant="danger">{errorDelete}</Message>}
             {loading ? <Loader/> : error ? <Message variant="danger">{error}</Message> : (
                 <Table striped bordered hover responsive className="table-sm">
                     <thead>
